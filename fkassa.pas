@@ -642,6 +642,7 @@ type
     procedure Seriayanitovarbimanochirish1Click(Sender: TObject);
     procedure hfio_DblClick(Sender: TObject);
     procedure Label48Click(Sender: TObject);
+    procedure bonusClick(Sender: TObject);
     procedure chekniochirish3Click(Sender: TObject);
     procedure TransportFieldEnter(Sender: TObject);
     procedure kubExit(Sender: TObject);
@@ -3786,6 +3787,7 @@ begin
   dms.asossumma_ch.AsInteger:=0;dms.asossum_d_ch.AsInteger:=0;
   dms.asos.post;
   dms.asos.Refresh;dms.asos_slave.Refresh;
+  bonus.Enabled:=true;bonus.Checked:=false;
   nom_.Enabled:=true;tel_.Enabled:=true;nom_.SetFocus;
 end;
 
@@ -3968,28 +3970,54 @@ begin
   if (dms.main_link.RecordCount>10) then
   begin
     ShowMessage('Diqqat !! Mijozga majburiy bonus hisoblanadi !');
-    bonus.Checked:=true;bonus.Enabled:=false;
-    DMS.asos.Edit;
+    bonus.Checked:=true;
+    bonus.Enabled:=false;
+    if not (DMS.asos.State in [dsEdit, dsInsert]) then
+      DMS.asos.Edit;
     DMS.asoscheg_n.AsFloat:=f*10/100;
     DMS.asoscheg_d.AsFloat:=n*10/100;
     DMS.asos.post;
   end
-  else
-    begin bonus.Checked:=false;bonus.Enabled:=true;
-    end;
-  if dms.main_link.RecordCount>1 and dms.main_link.RecordCount>10 and bonus.Checked=true then
+  else if (dms.main_link.RecordCount>1) and (dms.main_link.RecordCount<10) then
   begin
-    ShowMessage('Diqqat !! Mijozga ihtiyoriy  bonus hisoblanadi !');
-    bonus.Checked:=true;bonus.Enabled:=false;
-    DMS.asos.Edit;
-    DMS.asoscheg_n.AsFloat:=f*10/100;
-    DMS.asoscheg_d.AsFloat:=n*10/100;
-    DMS.asos.post;
+    bonus.Enabled:=true;
+    if bonus.Checked=true then
+    begin
+      ShowMessage('Diqqat !! Mijozga ihtiyoriy bonus hisoblanadi !');
+      if not (DMS.asos.State in [dsEdit, dsInsert]) then
+        DMS.asos.Edit;
+      DMS.asoscheg_n.AsFloat:=f*10/100;
+      DMS.asoscheg_d.AsFloat:=n*10/100;
+      DMS.asos.post;
+    end;
   end
   else
-    begin bonus.Checked:=false;bonus.Enabled:=true;
-    end;
+  begin
+    bonus.Checked:=false;
+    bonus.Enabled:=false;
+    if not (DMS.asos.State in [dsEdit, dsInsert]) then
+      DMS.asos.Edit;
+    DMS.asoscheg_n.AsFloat:=0;
+    DMS.asoscheg_d.AsFloat:=0;
+    DMS.asos.post;
+  end;
 
+end;
+
+procedure Tkassa.bonusClick(Sender: TObject);
+begin
+  if bonus.Checked=true then
+  begin
+    Label48Click(Sender);
+    Exit;
+  end;
+
+  if not (dms.asos.State in [dsEdit, dsInsert]) then
+    dms.asos.Edit;
+
+  DMS.asoscheg_n.AsFloat:=0;
+  DMS.asoscheg_d.AsFloat:=0;
+  dms.asos.Post;
 end;
 
 procedure Tkassa.chekniochirish3Click(Sender: TObject);
