@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Sayapr Map</title>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+function initMap() {
+
+    var center = {lat: 41.205, lng: 61.309};
+
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: center
+    });
+
+    var locations = [
+        ["Saepir MFY, Xumo kuchasi boshi",41.210910,61.313623],
+        ["Dexkon bozor yangi",41.210733,61.309687],
+        ["Bozor hududi",41.202414,61.307281],
+        ["Mol bozor, Guncha kucha",41.208843,61.308553],
+        ["Xumo va Buyuk Ipak Yo‘li chorrahasi",41.202037,61.307722],
+        ["Mingbulok kuchasi masjid",41.199126,61.316066],
+        ["Ming bulok kirish qismi",41.207864,61.310151],
+        ["MFY binosi oldi",41.193750,61.311142],
+        ["Nurmuxammad to‘yxona yonida",41.207549,61.310427],
+        ["Afsona kucha",41.206180,61.309004],
+        ["Ming bulok ko‘prik oldi",41.196668,61.311304],
+        ["Ming bulok oxiri",41.204269,61.303085],
+        ["Dovyurak maktab yonida",41.197605,61.308638],
+        ["Buyuk Iroq va Tinchlik kesishmasi",41.203635,61.303531],
+        ["Buyuk Ipak yo‘li va Faravonlik",41.201745,61.308587],
+        ["Pod stansiya yonida",41.200682,61.307908],
+        ["Xumo va Obixayot kesishmasi",41.201173,61.303401]
+    ];
+
+    for (var i = 0; i < locations.length; i++) {
+        var marker = new google.maps.Marker({
+            position: {lat: locations[i][1], lng: locations[i][2]},
+            map: map,
+            title: locations[i][0]
+        });
+    }
+}
+</script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?callback=initMap">
+</script>
+
+</body>
+</html>

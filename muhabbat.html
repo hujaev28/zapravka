@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sayapr Map 2</title>
+<style>
+#map {
+  height: 100vh;
+  width: 100%;
+}
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+function initMap() {
+
+  var center = {lat: 41.225, lng: 61.300};
+
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 13,
+    center: center
+  });
+
+  var locations = [
+    ["Muhabbat Mustaqillik 3/13",41.217466,61.316885],
+    ["Mustaqillik 3/20",41.214562,61.315361],
+    ["Xalqlar do'stligi 3/7",41.220243,61.316333],
+    ["Xalqlar do'stligi",41.220796,61.314037],
+    ["K.Ataniyozov ko'chasi",41.219710,61.310915],
+    ["K.Ataniyozov 3/3",41.217674,61.312189],
+    ["Soliq idorasi oldi",41.217995,61.312299],
+    ["Navqiron 3/15",41.221495,61.311142],
+    ["Isaev ko'chasi",41.220569,61.310514],
+    ["Bolalar o‘yingohi",41.216104,61.308710],
+    ["Xalqlar do‘stligi 2",41.218551,61.309850],
+    ["Mustaqillik ko‘chasi",41.214738,61.314420],
+    ["Arzazor chorraha",41.228836,61.270290],
+    ["Arzazor oxiri",41.228846,61.280873],
+    ["Nurofshon chorraha",41.226380,61.291131],
+    ["Kirobot Nastrin",41.227200,61.290699],
+    ["Kirobot oxiri",41.232539,61.267193],
+    ["20-maktab",41.236042,61.271548],
+    ["Navro‘z to‘yxona",41.242883,61.271425],
+    ["Javohir oxiri",41.245784,61.273764],
+    ["K.Otaniyozov oxiri",41.246389,61.271144]
+  ];
+
+  for (var i = 0; i < locations.length; i++) {
+    new google.maps.Marker({
+      position: {lat: locations[i][1], lng: locations[i][2]},
+      map: map,
+      title: locations[i][0]
+    });
+  }
+}
+</script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?callback=initMap">
+</script>
+
+</body>
+</html>

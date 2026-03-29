@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Saepir MFY – Xarita</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+  // Xarita markazi
+  const map = L.map('map').setView([41.203, 61.309], 14);
+
+  // OpenStreetMap qatlam
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
+  // Nuqtalar
+  const points = [
+    ["Saepir MFY, Xumo ko‘chasi boshi", 41.210910, 61.313623],
+    ["Dehqon bozori", 41.210733, 61.309687],
+    ["Bozor hududi", 41.202414, 61.307281],
+    ["Mol bozori, Guncha ko‘chasi", 41.208843, 61.308553],
+    ["Xumo va Buyuk Ipak yo‘li kesishmasi", 41.202037, 61.307722],
+    ["Mingbuloq ko‘chasi, Hazrati Ximmat bobo masjidi", 41.199126, 61.316066],
+    ["Mingbuloq ko‘chasi kirish qismi (1 ta yuz)", 41.207864, 61.310151],
+    ["MFY binosi oldi, Buyuk Ipak yo‘li (1 ta yuz)", 41.193750, 61.311142],
+    ["Buyuk Ipak yo‘li, Nurmuhammad to‘yxona yoni", 41.207549, 61.310427],
+    ["Afsona ko‘chasi (1 ta yuz)", 41.206180, 61.309004],
+    ["Mingbuloq ko‘chasi ko‘prik oldi (1 ta yuz)", 41.196668, 61.311304],
+    ["Mingbuloq ko‘chasi oxirgi chegara (1 ta nomer)", 41.204269, 61.303085],
+    ["Dovyurak ko‘chasi, 7-maktab va 9-MTM yonida", 41.197605, 61.308638],
+    ["Buyuk Iroq va Tinchlik ko‘chalari tutash joyi", 41.203635, 61.303531],
+    ["Buyuk Ipak yo‘li va Faravonlik ko‘chalari", 41.201745, 61.308587],
+    ["Buyuk Ipak yo‘li, MFY chegara (podstansiya)", 41.200682, 61.307908],
+    ["Xumo va Obixayot ko‘chalari tutash joyi", 41.201173, 61.303401]
+  ];
+
+  // Markerlar
+  points.forEach(p => {
+    L.marker([p[1], p[2]])
+      .addTo(map)
+      .bindPopup(`<b>${p[0]}</b><br>${p[1]}, ${p[2]}`);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,316 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{634A32D5-8C25-4161-A2E3-777C7AC833A9}</ProjectGuid>
+        <MainSource>rasta.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <TargetedPlatforms>1153</TargetedPlatforms>
+        <AppType>Application</AppType>
+        <FrameworkType>VCL</FrameworkType>
+        <ProjectVersion>18.2</ProjectVersion>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_E>false</DCC_E>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+        <DCC_N>true</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_DebugInformation>1</DCC_DebugInformation>
+        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_RangeChecking>true</DCC_RangeChecking>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+        <DCC_ExeOutput>D:\rasta</DCC_ExeOutput>
+        <DebugSourcePath>C:\Program Files (x86)\FastReports\FastReport 4\Source\;$(DebugSourcePath)</DebugSourcePath>
+        <DCC_UsePackage>vcl;rtl;vclx;indy;inet;xmlrtl;vclie;inetdbbde;inetdbxpress;dbrtl;dsnap;dsnapcon;vcldb;soaprtl;VclSmp;dbexpress;dbxcds;inetdb;bdertl;vcldbx;webdsnap;websnap;adortl;ibxpress;teeui;teedb;tee;dss;visualclx;visualdbclx;vclactnband;vclshlctrls;IntrawebDB_50_70;Intraweb_50_70;Rave50CLX;Rave50VCL;dclOfficeXP;SUIPackD7;fs7;frx7;frxcs7;fsDB7;frxDB7;fsBDE7;frxBDE7;fsADO7;frxADO7;fsIBX7;frxIBX7;frxDBX7;frxe7;fsTee7;frxTee7;RaizeComponentsVcl;RaizeComponentsVclDb;$(DCC_UsePackage)</DCC_UsePackage>
+        <SanitizedProjectName>rasta</SanitizedProjectName>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;Data.Win;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1049</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <Icon_MainIcon>rasta_Icon.ico</Icon_MainIcon>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <Icon_MainIcon>rasta_Icon.ico</Icon_MainIcon>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppEnableHighDPI>true</AppEnableHighDPI>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_Optimize>false</DCC_Optimize>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppEnableHighDPI>true</AppEnableHighDPI>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="fchiqim.pas">
+            <Form>chiqim</Form>
+        </DCCReference>
+        <DCCReference Include="fdms.pas">
+            <Form>DMS</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="fkassa_h_edit.pas">
+            <Form>kassa_h_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fkirim.pas">
+            <Form>kirim</Form>
+        </DCCReference>
+        <DCCReference Include="fkirim_asos.pas">
+            <Form>kirim_asos</Form>
+        </DCCReference>
+        <DCCReference Include="fotch_xarajat.pas">
+            <Form>otch_xarajat</Form>
+        </DCCReference>
+        <DCCReference Include="fparolizm.pas">
+            <Form>parolizm</Form>
+        </DCCReference>
+        <DCCReference Include="fqarzdorlik_diler.pas">
+            <Form>qarzdorlik_diler</Form>
+        </DCCReference>
+        <DCCReference Include="fs_asos.pas">
+            <Form>s_asos</Form>
+        </DCCReference>
+        <DCCReference Include="fs_client.pas">
+            <Form>s_client</Form>
+        </DCCReference>
+        <DCCReference Include="fs_client_edit.pas">
+            <Form>s_client_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fs_haridor.pas">
+            <Form>s_haridor</Form>
+        </DCCReference>
+        <DCCReference Include="fs_haridor_edit.pas">
+            <Form>s_haridor_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fs_x_tur.pas">
+            <Form>s_x_tur</Form>
+        </DCCReference>
+        <DCCReference Include="fs_kassa_edit.pas">
+            <Form>s_kassa_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fs_nom.pas">
+            <Form>s_nom</Form>
+        </DCCReference>
+        <DCCReference Include="fs_ombor.pas">
+            <Form>s_ombor</Form>
+        </DCCReference>
+        <DCCReference Include="fs_ombor_edit.pas">
+            <Form>s_ombor_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fs_ostatka.pas">
+            <Form>s_ostatka</Form>
+        </DCCReference>
+        <DCCReference Include="fs_tovar.pas">
+            <Form>s_tovar</Form>
+        </DCCReference>
+        <DCCReference Include="fs_tovar_edit.pas">
+            <Form>s_tovar_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fs_tovar_kirim.pas">
+            <Form>s_tovar_kirim</Form>
+        </DCCReference>
+        <DCCReference Include="fs_xodim.pas">
+            <Form>s_xodim</Form>
+        </DCCReference>
+        <DCCReference Include="fs_xodim_edit.pas">
+            <Form>s_xodim_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fsert.pas">
+            <Form>sertifikat</Form>
+        </DCCReference>
+        <DCCReference Include="fsert_edit.pas">
+            <Form>sert_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fsertovar_edit.pas">
+            <Form>serttovar_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fsetup.pas">
+            <Form>setup</Form>
+        </DCCReference>
+        <DCCReference Include="fshartnoma.pas">
+            <Form>shartnomalar</Form>
+        </DCCReference>
+        <DCCReference Include="fulanish.pas">
+            <Form>ulanish</Form>
+        </DCCReference>
+        <DCCReference Include="fvetrina_edit.pas">
+            <Form>vetrina_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fvitrina.pas">
+            <Form>vitrina</Form>
+        </DCCReference>
+        <DCCReference Include="fvitrina_asos.pas">
+            <Form>vitrina_asos</Form>
+        </DCCReference>
+        <DCCReference Include="fvozvrat.pas">
+            <Form>vozvrat</Form>
+        </DCCReference>
+        <DCCReference Include="fyangilash.pas">
+            <Form>yangilash</Form>
+        </DCCReference>
+        <DCCReference Include="fzavod.pas">
+            <Form>zavod</Form>
+        </DCCReference>
+        <DCCReference Include="janFX.pas"/>
+        <DCCReference Include="MultiTWAIN.pas"/>
+        <DCCReference Include="splash.pas">
+            <Form>splashForm</Form>
+        </DCCReference>
+        <DCCReference Include="fmain.pas">
+            <Form>main</Form>
+        </DCCReference>
+        <DCCReference Include="fkirim_edit.pas">
+            <Form>kirim_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fs_diler.pas">
+            <Form>s_diler</Form>
+        </DCCReference>
+        <DCCReference Include="fs_diler_edit.pas">
+            <Form>s_diler_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fkassa_izoh_edit.pas">
+            <Form>kassa_izoh_edit</Form>
+        </DCCReference>
+        <DCCReference Include="fs_kassa.pas">
+            <Form>s_kassa</Form>
+        </DCCReference>
+        <DCCReference Include="fpl_bank.pas">
+            <Form>pl_bank</Form>
+        </DCCReference>
+        <DCCReference Include="ftarozi.pas">
+            <Form>tarozi</Form>
+        </DCCReference>
+        <DCCReference Include="fs_birlik.pas">
+            <Form>s_birlik</Form>
+        </DCCReference>
+        <DCCReference Include="fs_kat.pas">
+            <Form>s_kat</Form>
+        </DCCReference>
+        <DCCReference Include="fpl.pas">
+            <Form>pl</Form>
+        </DCCReference>
+        <DCCReference Include="fbank_aylanma.pas">
+            <Form>bank_aylanma</Form>
+        </DCCReference>
+        <DCCReference Include="fqarzdorlik.pas">
+            <Form>qarzdorlik</Form>
+        </DCCReference>
+        <DCCReference Include="fkassa_aylanma.pas">
+            <Form>kassa_aylanma</Form>
+        </DCCReference>
+        <DCCReference Include="fotch_sverka.pas">
+            <Form>otch_sverka</Form>
+        </DCCReference>
+        <DCCReference Include="fotch_oborot_tovar.pas">
+            <Form>otch_oborot_tovar</Form>
+        </DCCReference>
+        <DCCReference Include="fhato_tovar_id.pas">
+            <Form>hato_tovar_id</Form>
+        </DCCReference>
+        <DCCReference Include="fkassa.pas">
+            <Form>kassa</Form>
+        </DCCReference>
+        <DCCReference Include="fkafe.pas">
+            <Form>kafe</Form>
+        </DCCReference>
+        <DCCReference Include="foshxona.pas">
+            <Form>oshxona</Form>
+        </DCCReference>
+        <None Include="ftoluv.~pas">
+            <ContainerId>File</ContainerId>
+        </None>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">rasta.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="iOSDevice64">True</Platform>
+                <Platform value="Linux64">True</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>
