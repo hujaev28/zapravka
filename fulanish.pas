@@ -145,7 +145,7 @@ var
 implementation
 {$R *.dfm}
 uses fdms,wcrypt2,Math,Winsock, fmain, fs_tovar, fyangilash,
-  fsetup, fkafe, foshxona, fs_t_otdel, fhato, fs_tovar_edit, fyukla;
+  fsetup, fkafe, foshxona, fs_t_otdel, fs_tovar_edit, fyukla;
 
 function Translate(Text : string;Lang:string;Dict:TIniFile):string;
 var s : string;

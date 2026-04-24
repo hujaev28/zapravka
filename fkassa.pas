@@ -425,7 +425,7 @@ type
     slave: TZQuery;
     nom_: TEdit;
     tel_: TEdit;
-    DBGridEh16: TDBGridEh;
+    show1: TDBGridEh;
     RzBitBtn6: TRzBitBtn;
     pnlDetails: TPanel;
     lblEncoding: TLabel;
@@ -513,6 +513,7 @@ type
     RzDBNumericEdit3: TRzDBNumericEdit;
     turi_: TRzRadioGroup;
     bonus: TCheckBox;
+    show2: TDBGridEh;
     procedure f5Click(Sender: TObject);
     procedure kolKeyPress(Sender: TObject; var Key: Char);
     procedure MenuItem2Click(Sender: TObject);
@@ -650,11 +651,16 @@ type
     procedure jamiExit(Sender: TObject);
     procedure jamiKeyPress(Sender: TObject; var Key: Char);
     procedure kubKeyPress(Sender: TObject; var Key: Char);
+    procedure Label45DblClick(Sender: TObject);
+    procedure Memo2DblClick(Sender: TObject);
   private
     FQRCode: TDelphiZXingQRCode;
     // to fix well-known Delphi 7 error with visually vanishing components
     // under Windows Vista, 7, and later
     FAltFixed: Boolean;
+    FInitializingForm: Boolean;
+    FUpdatingDefaultPrinter: Boolean;
+    FActivatingForm: Boolean;
     procedure RemakeQR(s:string);
     procedure EnsureTransportSlaveRow;
 
@@ -673,6 +679,9 @@ uses QRGraphics, QR_Win1251, QR_URL,frxBarcode,comobj,fdms, fs_tovar, fulanish_k
   fsetup, fs_haridor,ClipBrd, MaskUtils, fkassa_kv, fs_haridor_edit,IdMultipartFormData,ShellAPI;
 
 {$R *.dfm}
+
+var FQoldiqCalcActive: Boolean = False;
+
 function kasayatime(date:TDateTime):String;
 var OldFormat,ResultStr: string;
 begin
@@ -703,6 +712,8 @@ end;
 procedure Tkassa.EnsureTransportSlaveRow;
 const
   DEFAULT_TRANSPORT_TOVAR_ID = 1;
+var
+  bNewRow: Boolean;
 begin
   if not dms.asos.Active then
     Exit;
@@ -713,11 +724,13 @@ begin
   if not dms.asos_slave.Active then
     dms.asos_slave.Open;
 
+  bNewRow := False;
   if not (dms.asos_slave.State in [dsEdit, dsInsert]) then
   begin
     if dms.asos_slave.RecordCount > 0 then
       Exit;
     dms.asos_slave.Append;
+    bNewRow := True;
   end;
 
   if dms.asos_slavetovar_id.AsInteger = 0 then
@@ -733,6 +746,11 @@ begin
     else if dms.s_tovar.Locate('id', DEFAULT_TRANSPORT_TOVAR_ID, [loCaseInsensitive]) then
       dms.asos_slavetovar_nom.AsString := dms.s_tovarnom.AsString;
   end;
+
+  // Yangi yaratilgan slave qatorini darhol DB ga saqlash.
+  // asos yopilganda pending insert yo'qolmasligi uchun.
+  if bNewRow then
+    dms.asos_slave.Post;
 end;
 
 function SumNumToFull(Number:real;s1,s2:string):string;
@@ -1109,15 +1127,26 @@ end;
 procedure Tkassa.f5Click(Sender: TObject);
 var s,s_old,ss,stel,telsms:string;kol:integer;f,d,danq,danqd,kirim,kirimd,chiqim,chiqimd:Currency;
 begin
-  if dms.asossumma.AsFloat < dms.asosqarz_summa.AsFloat then begin
-    ShowMessage('Qarz summa umumiy summadan katta bo`lish mumkin emas !!!');exit;
+  //if dms.main_link.RecordCount=0 then begin ShowMessage('Chek chiqarich uchun tovar kiritilmagan');kub.SetFocus;exit;end;
+  //try
+  //  if dms.asossana.AsDateTime>StrToDate('25.12.2026') then begin
+  //    ShowMessage('sana kiritilmagan');exit;
+  //  end;
+  //except
+  //end;
+  if (DMS.asos_slavesumma.AsFloat=0) and (DMS.asos_slaveopt1.AsFloat=0) then
+  begin
+    ShowMessage('Summa yoki kubni kiriting');
+    jami.SetFocus;
+    exit;
   end;
-  if dms.main_link.RecordCount=0 then begin ShowMessage('Chek chiqarich uchun tovar kiritilmagan');kub.SetFocus;exit;end;
-  try
-    if dms.asossana.AsDateTime>StrToDate('25.12.2026') then begin
-      ShowMessage('sana kiritilmagan');exit;
-    end;
-  except
+  if (DMS.asos_slavesotish.AsFloat=0) then
+  begin
+    ShowMessage('Sotish narhi kiriting');exit;
+  end;
+  if (DMS.asosh_id.AsInteger=0) then
+  begin
+    ShowMessage('Haridorni tanlang');exit;
   end;
   dms.asos.Edit;dms.asosprint_flag.AsFloat:=0;
   DMS.setup.Refresh;  DMS.main_link.Refresh;
@@ -1138,6 +1167,8 @@ begin
     dms.link.ExecSQL;
   end;
   dms.asos.Post;
+  if dms.asos.State=dsInsert then
+    dms.asos.Cancel;
   if dms.asosh_id.AsInteger>0 then
   begin
     haridor_id:=dms.asosh_id.AsString;
@@ -1166,28 +1197,37 @@ begin
     end;
     DateSeparator := '.';ShortDateFormat := 'dd.mm.yy';
   end; // h_id
-
-
-  //Label48Click(sender);
   frxsf.PrintOptions.Printer := chekPrinters.Text;
   frxsf.SelectPrinter;frxsf.PrepareReport;
   frxsf.PrintOptions.ShowDialog := false;
   frxsf.Height := 100;
   frxsf.ShowReport;
   frxsf.Print;
+  if dms.asos.State=dsInsert then
+    dms.asos.Cancel;
   Label44DblClick(Sender);
+  if dms.asos.State=dsInsert then
+  ShowMessage('Label44DblClick');
   dms.asos.Close;dms.asos.SQL.Clear;
   //dms.asos.SQL.Add('select * from asos where del_flag=1 and tur_oper=2 and diler_id=0 and mobil=0 and client_id='+admin_clid+'  and user_id='+admin_id+'  and sana="'+FormatDateTime('yyyy-mm-dd',dms.setupvaqt.AsDateTime)+'" order by id desc');
   dms.asos.SQL.Add('select * from asos where del_flag=1 and tur_oper=2 and diler_id=0 and mobil=0 and client_id='+admin_clid+'  and user_id='+admin_id+'  and not (pl_id is not Null or plastik_id is not Null) order by id desc');
   dms.asos.open;
+
   if (not dms.asos.Locate('diler_id',0,[loCaseInsensitive])) then begin
-    dms.asos.Append;
-    dms.asostur_oper.AsInteger:=2;
+    dms.asos.Append;dms.asostur_oper.AsInteger:=2;
+    bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
     dms.asos.Post;
+    dms.asos.Close;
+    dms.asos.Open;
+    EnsureTransportSlaveRow;
   end;
+  if dms.asos.State=dsInsert then
+  ShowMessage('dms.asos.State=dsInsert 1223');
   varaqClick(Sender);
+  if dms.asos.State=dsInsert then
+  ShowMessage('dms.asos.State=dsInsert 1128');
   nom_.Text:='';tel_.Text:='';
-  nom_.Enabled:=true;tel_.Enabled:=true;
+  nom_.Enabled:=true;//tel_.Enabled:=true;
   nom_.SetFocus;
 end;
 
@@ -1283,44 +1323,59 @@ end;
 procedure Tkassa.FormActivate(Sender: TObject);
 var IniFile:TIniFile;
 begin
+  if FActivatingForm then
+    Exit;
+
+  FActivatingForm := True;
+  try
     //ShowMessage(dms.asos.SQL.Text);
-  if dms.asos.RecordCount=0 then begin
-    dms.asos.Append;dms.asostur_oper.AsInteger:=2;
-    dms.asos.Post;
-    dms.asos.Refresh;
+    if dms.asos.RecordCount=0 then begin
+      dms.asos.Append;dms.asostur_oper.AsInteger:=2;
+          bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+
+      dms.asos.Post;
+      dms.asos.Close;
+      dms.asos.Open;
+      EnsureTransportSlaveRow;
+    end;
+    {if DMS.s_clientdollar.AsInteger=2 then begin
+      kassa.valyuta.ItemIndex:=1;kassa.valyuta.Visible:=false;
+    end;}
+
+    kat.Open;
+    if dms.s_clientgaraj_turi.Value=1 then kassa.varaq.Pages[6].TabVisible:=true else kassa.varaq.Pages[6].TabVisible:=false;
+
+    if dms.s_clientdollar.AsInteger=0 then begin
+      Lkonv.Visible:=false;konv.Visible:=false;
+      Lkurs.Visible:=false;kurs.Visible:=false;
+      Lsena_d.Visible:=false;sena_d.Visible:=false;
+
+    end;
+    if dms.s_clientkomputer.Value=1 then
+    kassa.varaq.Pages[7].TabVisible:=true else kassa.varaq.Pages[7].TabVisible:=false;
+    dms.s_tovar.Close;dms.s_tovar.SQL.Clear;
+    dms.s_tovar.SQL.Add('select *,id as tovar_id from s_tovar WHERE del_flag=1');
+    dms.s_tovar.open;
+    dms.asos_slave.Refresh;
+    if dms.protizm.Active=false then dms.protizm.Open;
+    kassa_h_edit.oraliq.Open;
+    //kassa_h_edit.lbd_pl.Open;
+
+    
+    IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
+    try
+      chekPrinters.Text := IniFile.ReadString('BAZA','printerchek','');
+      tpechat.Enabled:=True;
+    finally
+      IniFile.Free;
+    end;
+    //if dms.asos.RecordCount>1 then gasos.Visible:=true else gasos.Visible:=false;
+    nom_.Enabled:=true;
+    nom_.SetFocus;
+    varaqClick(Sender);
+  finally
+    FActivatingForm := False;
   end;
-  {if DMS.s_clientdollar.AsInteger=2 then begin
-    kassa.valyuta.ItemIndex:=1;kassa.valyuta.Visible:=false;
-  end;}
-
-  kat.Open;
-  if dms.s_clientgaraj_turi.Value=1 then kassa.varaq.Pages[6].TabVisible:=true else kassa.varaq.Pages[6].TabVisible:=false;
-
-  if dms.s_clientdollar.AsInteger=0 then begin
-    Lkonv.Visible:=false;konv.Visible:=false;
-    Lkurs.Visible:=false;kurs.Visible:=false;
-    Lsena_d.Visible:=false;sena_d.Visible:=false;
-
-  end;
-  if dms.s_clientkomputer.Value=1 then
-  kassa.varaq.Pages[7].TabVisible:=true else kassa.varaq.Pages[7].TabVisible:=false;
-  dms.s_tovar.Close;dms.s_tovar.SQL.Clear;
-  dms.s_tovar.SQL.Add('select *,id as tovar_id from s_tovar WHERE del_flag=1');
-  dms.s_tovar.open;
-  dms.asos_slave.Refresh;
-  if dms.protizm.Active=false then dms.protizm.Open;
-  kassa_h_edit.oraliq.Open;
-  //kassa_h_edit.lbd_pl.Open;
-
-  
-  IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
-  chekPrinters.Text := IniFile.ReadString('BAZA','printerchek','');
-  tpechat.Enabled:=True;
-  IniFile.Destroy;
-  //if dms.asos.RecordCount>1 then gasos.Visible:=true else gasos.Visible:=false;
-  nom_.Enabled:=true;
-  nom_.SetFocus;
-  varaqClick(Sender);
 end;
 
 procedure Tkassa.FormShow(Sender: TObject);
@@ -1344,6 +1399,7 @@ end;
 procedure Tkassa.FormCreate(Sender: TObject);
 var IniFile:TIniFile;H: Integer;
 begin
+  FInitializingForm := True;
   FQRCode := nil; CodStr := TStringList.Create;
   // number edit
   SetWindowLong(edtQuietZone.Handle, GWL_STYLE,GetWindowLong(edtQuietZone.Handle, GWL_STYLE) or ES_NUMBER);
@@ -1379,31 +1435,42 @@ begin
 
 
   jami.DisplayFormat := ',0.00'; // ???????: 1 250.50
- data1.Value:=Date();data2.Value:=Date();
+  data1.Value:=Date();data2.Value:=Date();
   ed1:='';
-  cbPrinters.Items.Assign(Printer.Printers);
-  cbPrinters.Text := Printer.Printers[Printer.PrinterIndex];
-  chekPrinters.Items.Assign(Printer.Printers);
-  chekPrinters.Text := Printer.Printers[Printer.PrinterIndex];
-  a4Printers.Items.Assign(Printer.Printers);
-  a4Printers.Text := Printer.Printers[Printer.PrinterIndex];
-  yorliqPrinters.Items.Assign(Printer.Printers);
-  yorliqPrinters.Text := Printer.Printers[Printer.PrinterIndex];
-  // Update the label to reflect the default printer
-  IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
-  chekPrinters.Text := IniFile.ReadString('BAZA','printerchek','');
-  a4Printers.Text := IniFile.ReadString('BAZA','printera4','');
-  yorliqPrinters.Text := IniFile.ReadString('BAZA','printeryorliq','');
-  chekshablon.Text := IniFile.ReadString('BAZA','shablonchek','chek58.fr3');
-  a4shablon.Text := IniFile.ReadString('BAZA','shablona4','chekla4.fr3');
-  yorliqshablon.Text := IniFile.ReadString('BAZA','yorliqshablon','');IniFile.Free;
-  shalonlar;
-  IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
-  if IniFile.SectionExists(name)=False then begin
-    IniFile.WriteInteger(name, 'left',Left);IniFile.WriteInteger(name, 'width', Width);
-    IniFile.WriteInteger(name, 'top', Top);IniFile.WriteInteger(name, 'height', Height);
+  try
+    cbPrinters.Items.Assign(Printer.Printers);
+    cbPrinters.Text := Printer.Printers[Printer.PrinterIndex];
+    chekPrinters.Items.Assign(Printer.Printers);
+    chekPrinters.Text := Printer.Printers[Printer.PrinterIndex];
+    a4Printers.Items.Assign(Printer.Printers);
+    a4Printers.Text := Printer.Printers[Printer.PrinterIndex];
+    yorliqPrinters.Items.Assign(Printer.Printers);
+    yorliqPrinters.Text := Printer.Printers[Printer.PrinterIndex];
+    // Update the label to reflect the default printer
+    IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
+    try
+      chekPrinters.Text := IniFile.ReadString('BAZA','printerchek','');
+      a4Printers.Text := IniFile.ReadString('BAZA','printera4','');
+      yorliqPrinters.Text := IniFile.ReadString('BAZA','printeryorliq','');
+      chekshablon.Text := IniFile.ReadString('BAZA','shablonchek','chek58.fr3');
+      a4shablon.Text := IniFile.ReadString('BAZA','shablona4','chekla4.fr3');
+      yorliqshablon.Text := IniFile.ReadString('BAZA','yorliqshablon','');
+    finally
+      IniFile.Free;
+    end;
+    shalonlar;
+    IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
+    try
+      if IniFile.SectionExists(name)=False then begin
+        IniFile.WriteInteger(name, 'left',Left);IniFile.WriteInteger(name, 'width', Width);
+        IniFile.WriteInteger(name, 'top', Top);IniFile.WriteInteger(name, 'height', Height);
+      end;
+    finally
+      IniFile.Free;
+    end;
+  finally
+    FInitializingForm := False;
   end;
-  inifile.Free;
 end;
 
 procedure Tkassa.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -1471,8 +1538,14 @@ begin
       dms.asos.Edit;dms.asossana.AsDateTime:=Date;dms.asos.Post;dms.asos.Refresh;
     end;
     if dms.asos.RecordCount=0 then begin
-      dms.asos.Append;dms.asostur_oper.AsInteger:=2;dms.asos.Post;dms.asos.Refresh;
+      dms.asos.Append;dms.asostur_oper.AsInteger:=2;dms.asos.Post;
+          bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+
+      EnsureTransportSlaveRow;
     end;
+    if dms.asos.State=dsInsert then
+    ShowMessage('asosiy');
+
     tpl.Close;tpl.SQL.Clear;
     tpl.SQL.Add('select * from pl WHERE del_flag=1 and vid <> 1 order by d_pl desc ');
     tpl.open;
@@ -1560,8 +1633,16 @@ begin
     dms.s_haridor.open;
     poisk_h.Text:='';
     Label48Click(Sender);
-    nom_.Enabled:=true;tel_.Enabled:=true;
+    nom_.Enabled:=true;//tel_.Enabled:=true;
     sot.Value:=kassa.qoldiq.fieldbyname('sotish').AsFloat;
+    if DMS.asos_slavezakaz_gapir.AsVariant=1  then
+      begin
+        bonus.OnClick := nil;bonus.Checked := True;bonus.OnClick := bonusClick;
+      end
+    else
+    begin
+      bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+    end;
   end;
   1:begin // x - hisobot
       dms.x_otchet.Close;dms.x_otchet.SQL.Clear; // xodimlar bo`yicha
@@ -1668,6 +1749,14 @@ end;
 procedure Tkassa.cbPrintersChange(Sender: TObject);
 var IniFile: TIniFile; TempStr1, TempStr2: string; S: array[0..64] of char;
 begin
+  if FInitializingForm or FUpdatingDefaultPrinter then
+    Exit;
+
+  if (cbPrinters.ItemIndex < 0) or (cbPrinters.ItemIndex >= Printer.Printers.Count) then
+    Exit;
+
+  FUpdatingDefaultPrinter := True;
+  try
   with Printer do begin
     // Set the new printer based on the ComboBox's selected printer
     PrinterIndex := cbPrinters.ItemIndex;
@@ -1688,6 +1777,9 @@ begin
     finally
       IniFile.Free;
     end;
+  end;
+  finally
+    FUpdatingDefaultPrinter := False;
   end;
   // Update the label to reflect the new printer selection
   //lblPrinter.Caption := Printer.Printers[Printer.PrinterIndex];
@@ -1736,6 +1828,8 @@ end;
 procedure Tkassa.tanlashChange(Sender: TObject);
 var IniFile: TIniFile;
 begin
+  if FInitializingForm then
+    Exit;
   IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
   IniFile.WriteString('BAZA','strixqidir',inttostr(tanlash.ItemIndex));IniFile.Destroy;
 end;
@@ -2004,6 +2098,8 @@ end;
 procedure Tkassa.yorliqPrintersChange(Sender: TObject);
 var IniFile:TIniFile;
 begin
+  if FInitializingForm then
+    Exit;
   IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
   IniFile.WriteString('BAZA','printeryorliq',yorliqPrinters.Text);IniFile.Destroy;
 end;
@@ -2011,6 +2107,8 @@ end;
 procedure Tkassa.chekPrintersChange(Sender: TObject);
 var IniFile:TIniFile;
 begin
+  if FInitializingForm then
+    Exit;
   IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
   IniFile.WriteString('BAZA','printerchek',chekPrinters.Text);IniFile.Destroy;
   {n:=ListBox1.ItemIndex;lblPrinter.Caption:=ListBox1.Items[n];
@@ -2021,6 +2119,8 @@ end;
 procedure Tkassa.chekshablonChange(Sender: TObject);
 var IniFile:TIniFile;
 begin
+  if FInitializingForm then
+    Exit;
   IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
   IniFile.WriteString('BAZA','shablonchek',chekshablon.Text);IniFile.Destroy;
   {n:=file_chek.ItemIndex;lblchek.Caption:=file_chek.Items[n];
@@ -2031,6 +2131,8 @@ end;
 procedure Tkassa.yorliqshablonChange(Sender: TObject);
 var IniFile:TIniFile;
 begin
+  if FInitializingForm then
+    Exit;
   IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
   IniFile.WriteString('BAZA','shablonyorliq',yorliqshablon.Text);IniFile.Destroy;
 end;
@@ -2100,7 +2202,9 @@ begin
       if (dms.s_clientdollar.asinteger=2) then dms.asosdollar.AsInteger:=1;
       dms.asos.Append;
       dms.asostur_oper.AsInteger:=2;
-      dms.asos.Post;
+      dms.asos.Post;     bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+
+      EnsureTransportSlaveRow;
     end;
 
 end;
@@ -2158,6 +2262,7 @@ begin
   //DMS.asos.Locate('id',dms.k_asosid.AsInteger,[loCaseInsensitive]);
 
   varaq.ActivePageIndex:=0;
+  nom_.Enabled:=true;
   nom_.SetFocus;
 end;
 
@@ -2177,7 +2282,7 @@ begin
     varaq.ActivePageIndex:=0;
     
     //if dms.asosh_id.AsInteger>0 then h.Value:=dms.asosh_id.AsInteger else h.Value:=Null;
-    nom_.SetFocus;
+    nom_.Enabled:=true;nom_.SetFocus;
     DMS.asos_slave.Refresh;
 end;
 
@@ -2200,13 +2305,25 @@ begin
     ShowMessage('Summa 0 ga teng');
     exit;
   end;
+  frxsf.LoadFromFile(ExtractFilePath(Application.ExeName)+'zet.fr3');
   if f>0 then begin
-    s:= floattostr(f)+' - asosiy summa , M3 - ' + floattostr(d);
-  end;
-  if p>0 then begin
-    s:=iif(f=0,'',s+#13+' va ')+ floattostr(p)+' bonus summa ' + floattostr(c);
+    s:= 'summa = '+floattostr(f)+'  , M3 - ' + floattostr(d);
+    frxsf.Variables['nnn']:=''''+s+'''';
   end;
   if s='' then begin ShowMessage('Kun yopilgan !!!');exit;end;
+  if p>0 then begin
+    //s:=iif(f=0,'',s+' va ')+ floattostr(p)+' bonus' + floattostr(c);
+    s:='Bonus = '+floattostr(p)+' M3 - ' + floattostr(c);
+    frxsf.Variables['bonus']:=''''+s+'''';
+  end;
+    //s:=iif(f=0,'',s+' va ')+ floattostr(p)+' bonus' + floattostr(c);
+    s:='Jami = '+floattostr(f-p)+' M3 - ' + floattostr(d-c);
+    frxsf.Variables['jami']:=''''+s+'''';
+  frxsf.PrintOptions.Printer := chekPrinters.Text;
+  frxsf.SelectPrinter;frxsf.PrepareReport;
+  frxsf.PrintOptions.ShowDialog := false;
+  frxsf.Height := 100;
+  frxsf.ShowReport;
   if MessageDlg(s+' yaratasizmi ?',mtConfirmation, [mbYes, mbNo], 0) <> mrYes then exit;
   if f>0 then begin
     tpl.Append;
@@ -2608,6 +2725,7 @@ begin
   dms.asos.open;
   dms.asos_slave.open;
   varaq.ActivePageIndex:=0;
+  nom_.Enabled:=true;
   nom_.SetFocus;
 end;
 
@@ -2623,6 +2741,8 @@ end;
 procedure Tkassa.a4PrintersChange(Sender: TObject);
 var IniFile:TIniFile;
 begin
+  if FInitializingForm then
+    Exit;
   IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
   IniFile.WriteString('BAZA','printera4',a4Printers.Text);IniFile.Destroy;
 end;
@@ -2630,6 +2750,8 @@ end;
 procedure Tkassa.a4shablonChange(Sender: TObject);
 var IniFile:TIniFile;
 begin
+  if FInitializingForm then
+    Exit;
   IniFile := TIniFile.Create(ExtractFilePath(Application.ExeName)+'sozlash.ini');
   IniFile.WriteString('BAZA','shablona4',a4shablon.Text);IniFile.Destroy;
 
@@ -3014,7 +3136,9 @@ begin
     dms.asos.Append;
     if (dms.s_clientdollar.asinteger=2) then dms.asosdollar.AsInteger:=1;
     dms.asostur_oper.AsInteger:=2;
-    dms.asos.Post;
+    dms.asos.Post;    bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+
+    EnsureTransportSlaveRow;
   end;
   varaqClick(Sender);
   kub.SetFocus;
@@ -3098,7 +3222,9 @@ begin
     dms.asos.Append;
     if (dms.s_clientdollar.asinteger=2) then dms.asosdollar.AsInteger:=1;
     dms.asostur_oper.AsInteger:=2;
-    dms.asos.Post;dms.asos.Refresh;
+    dms.asos.Post;      bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+
+    EnsureTransportSlaveRow;
     varaqClick(sender);
     //varaqf6.Pages[dms.asos.RecNo-1].Color:=$00B4E6F0;varaqf6.Pages[dms.asos.RecNo-1].Caption:=dms.asossana.AsString;varaqf6.Pages[dms.asos.RecNo-1].tabVisible:=true;
     //varaqf6.Pages[dms.asos.RecNo].Color:=clLime;varaqf6.Pages[dms.asos.RecNo].Caption:=' + ';varaqf6.Pages[dms.asos.RecNo].tabVisible:=true;
@@ -3139,9 +3265,16 @@ end;
 
 procedure Tkassa.qoldiqCalcFields(DataSet: TDataSet);
 begin
-  if  qoldiq.fieldbyname('dollar').AsInteger=0 then
-  qoldiq.fieldbyname('kirim').AsFloat:=qoldiq.fieldbyname('kirim').AsFloat else
-  qoldiq.fieldbyname('kirim').AsFloat:=qoldiq.fieldbyname('kirim_d').AsFloat;
+  if FQoldiqCalcActive then Exit;
+  FQoldiqCalcActive := True;
+  try
+    if qoldiq.fieldbyname('dollar').AsInteger=0 then
+      qoldiq.fieldbyname('kirim').AsFloat:=qoldiq.fieldbyname('kirim').AsFloat
+    else
+      qoldiq.fieldbyname('kirim').AsFloat:=qoldiq.fieldbyname('kirim_d').AsFloat;
+  finally
+    FQoldiqCalcActive := False;
+  end;
 end;
 
 procedure Tkassa.Dialog1Click(Sender: TObject);
@@ -3294,7 +3427,9 @@ begin
     dms.asos.Append;
     if (dms.s_clientdollar.asinteger=2) then dms.asosdollar.AsInteger:=1;
     dms.asostur_oper.AsInteger:=2;
-    dms.asos.Post;
+    dms.asos.Post;      bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+
+    EnsureTransportSlaveRow;
   end;
   varaqClick(Sender);
   kub.SetFocus;
@@ -3347,7 +3482,8 @@ begin
   if (Key = #13) then begin
   if Length(poisk_h.Text)>1 then begin
    dms.link.Close;dms.link.sql.Clear;
-   dms.link.SQL.Add('select * from s_haridor WHERE del_flag=1 and ((telsms1 like "%'+lat_kril(poisk_h.Text)+'%") or (nom like "%'+lat_kril(poisk_h.Text)+'%") or (nom like "%'+poisk_h.Text+'%")) order by nom');
+   //dms.link.SQL.Add('select * from s_haridor WHERE del_flag=1 and ((telsms1 like "%'+lat_kril(poisk_h.Text)+'%") or (nom like "%'+lat_kril(poisk_h.Text)+'%") or (nom like "%'+poisk_h.Text+'%")) order by nom');
+   dms.link.SQL.Add('select * from s_haridor WHERE del_flag=1 and ((nom like "%'+lat_kril(poisk_h.Text)+'%") or (nom like "%'+poisk_h.Text+'%")) order by nom');
    dms.link.open;
   end;
 end;
@@ -3379,7 +3515,9 @@ begin
   dms.asos.Append;
   if (dms.s_clientdollar.asinteger=2) then dms.asosdollar.AsInteger:=1;
   dms.asostur_oper.AsInteger:=2;
-  dms.asos.Post;dms.asos.Refresh;
+  dms.asos.Post;    bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+
+  EnsureTransportSlaveRow;
   varaqClick(sender);
 end;
 
@@ -3507,10 +3645,12 @@ begin
     dms.asos.SQL.Add('select * from asos where del_flag=1 and tur_oper=2 and diler_id=0 and mobil=0 and client_id='+admin_clid+'  and user_id='+admin_id+'  and not (pl_id is not Null or plastik_id is not Null) order by id desc');
     dms.asos.open;
     if (not dms.asos.Locate('diler_id',0,[loCaseInsensitive])) then begin
-      dms.asos.Append; 
+      dms.asos.Append;
       if (dms.s_clientdollar.asinteger=2) then dms.asosdollar.AsInteger:=1;
       dms.asostur_oper.AsInteger:=2;
-      dms.asos.Post;
+      dms.asos.Post;      bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+
+      EnsureTransportSlaveRow;
     end;
     varaqClick(Sender);
     kub.SetFocus;
@@ -3643,7 +3783,8 @@ begin
       dms.asos.Append;
       if (dms.s_clientdollar.asinteger=2) then dms.asosdollar.AsInteger:=1;
       dms.asostur_oper.AsInteger:=2;
-      dms.asos.Post;
+      dms.asos.Post;     bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+EnsureTransportSlaveRow;
     end;
     varaqClick(Sender);
     kub.SetFocus;
@@ -3656,7 +3797,7 @@ begin
     dms.s_haridor.Append;
     dms.s_haridoruser_id.value:=dms.s_user.FieldByName('id').AsInteger;
     dms.s_haridorclient_id.value:=dms.s_user.FieldByName('client_id').AsInteger;
-    dms.s_haridornom.AsString:=nom_.Text;dms.s_haridortelsms1.AsString:=tel_.Text;
+    dms.s_haridornom.AsString:=nom_.Text;//dms.s_haridortelsms1.AsString:=tel_.Text;
     dms.s_haridor.post;
     DMS.haridorlar.Refresh;
 
@@ -3679,7 +3820,7 @@ begin
 
   if dms.link.RecordCount=1 then begin
       nom_.Text:=dms.link.fieldbyname('nom').AsString;
-      nom_.Enabled:=false;tel_.Enabled:=false;
+      nom_.Enabled:=false;//tel_.Enabled:=false;
       dms.asos.Edit;
       dms.asosh_id.AsInteger:=dms.link.fieldbyname('id').AsInteger;
       dms.asos.Post;
@@ -3698,12 +3839,12 @@ begin
       nom_.Text:='';
       gclient.SetFocus;
   end;
-  if dms.link.RecordCount=0 then begin
+  {if dms.link.RecordCount=0 then begin
 
       tel_.Text:='';
       tel_.SetFocus;
       exit;
-  end;
+  end;}
 end;
 
 procedure Tkassa.tel_Exit(Sender: TObject);
@@ -3736,7 +3877,8 @@ begin
       gclient.SetFocus;
     //end;
   end;
-  If (tel_.text<>'') and (nom_.text='') then nom_.SetFocus;
+  //If (tel_.text<>'') and (nom_.text='') then nom_.SetFocus;
+  If (nom_.text='') then nom_.SetFocus;
 end;
 
 procedure Tkassa.nom_KeyPress(Sender: TObject; var Key: Char);
@@ -3754,8 +3896,8 @@ procedure Tkassa.gclientDblClick(Sender: TObject);
 begin
 
     nom_.Text:=dms.link.fieldbyname('nom').AsString;
-    tel_.Text:=DMS.link.fieldbyname('telsms1').AsString;
-    nom_.Enabled:=false;tel_.Enabled:=false;
+    //tel_.Text:=DMS.link.fieldbyname('telsms1').AsString;
+    nom_.Enabled:=false;//tel_.Enabled:=false;
   dms.asos.Edit;
   dms.asosh_id.AsInteger:=DMS.link.fieldbyname('id').AsInteger;
   dms.asos.Post;
@@ -3768,7 +3910,7 @@ end;
 
 procedure Tkassa.bekorClick(Sender: TObject);
 begin
-  nom_.Enabled:=true;tel_.Enabled:=true;
+  nom_.Enabled:=true;//tel_.Enabled:=true;
   nom_.SetFocus;
 end;
 
@@ -3787,8 +3929,9 @@ begin
   dms.asossumma_ch.AsInteger:=0;dms.asossum_d_ch.AsInteger:=0;
   dms.asos.post;
   dms.asos.Refresh;dms.asos_slave.Refresh;
-  bonus.Enabled:=true;bonus.Checked:=false;
-  nom_.Enabled:=true;tel_.Enabled:=true;nom_.SetFocus;
+  bonus.Checked:=false;
+  nom_.Enabled:=true;//tel_.Enabled:=true;
+  nom_.SetFocus;
 end;
 
 procedure Tkassa.cbbErrorCorrectionLevelChange(Sender: TObject);
@@ -3945,9 +4088,130 @@ end;
 procedure Tkassa.Label48Click(Sender: TObject);
 var f,n:Currency;
 begin
-  EnsureTransportSlaveRow;
-  if dms.asos_slave.State = dsInsert then
-    dms.asos_slave.Post;
+  //exit;
+  if (not dms.asos.Locate('diler_id',0,[loCaseInsensitive])) then begin
+    dms.asos.Append;dms.asostur_oper.AsInteger:=2;
+    dms.asos.Post;
+    bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+    EnsureTransportSlaveRow;
+  end;
+
+  //EnsureTransportSlaveRow;
+  //if dms.asos_slave.State = dsInsert then
+  //  dms.asos_slave.Post;
+    if not (DMS.asos_slave.State in [dsEdit, dsInsert]) then
+      DMS.asos_slave.Edit;
+    if bonus.Checked=true then
+    begin
+    DMS.asos_slavezakaz_gapir.AsVariant:=1;
+    bonus.OnClick := nil;bonus.Checked := True;bonus.OnClick := bonusClick;
+    end
+    else
+    begin
+    bonus.OnClick := nil;bonus.Checked := false;bonus.OnClick := bonusClick;
+    DMS.asos_slavezakaz_gapir.AsVariant:=0;
+    end;
+    DMS.asos_slave.post;
+
+  //if dms.asosh_id.AsString='' then exit;
+  dms.main_link.Close;dms.main_link.SQL.Clear;
+  dms.main_link.SQL.Add('select a.id,a.diler_id,a.sana, h.nom,h.telsms1,a.kurs,a.summa,qabul_sana from asos a,s_haridor h WHERE a.h_id=h.id and  a.del_flag=1 and ');
+  //dms.main_link.SQL.Add(' a.id <> '+dms.asosid.AsString+'  and a.h_id='+dms.asosh_id.AsString+'  and a.qabul_sana is null order by a.id');
+  dms.main_link.SQL.Add(' a.h_id="'+dms.asosh_id.AsString+'"  and a.qabul_sana is null order by a.id');
+  //dms.main_link.SQL.Add(' a.h_id="'+dms.asosh_id.AsString+'"  and (a.qabul_sana is null or a.qabul_sana = "'+kasayatime(dms.asosqabul_sana.AsDateTime)+'") order by a.id');
+  //dms.main_link.Close;
+  //memo2.Visible:=true;memo2.Lines.Add(dms.main_link.SQL.Text);
+  dms.main_link.open;
+  f:=0;n:=0;
+  dms.main_link.First;
+  while not dms.main_link.eof do begin
+      if (DMS.asosid.AsInteger<>dms.main_link.FieldByName('id').AsInteger) then begin
+        f:=f+dms.main_link.fieldbyname('summa').AsFloat;
+        n:=n+dms.main_link.fieldbyname('kurs').AsFloat;
+      end;
+    dms.main_link.Next;
+  end;
+  Label48.Caption:='Bonus cheklar = ' + IntToStr(dms.main_link.RecordCount)+' | m3 = ' + FloatToStr(n*100/100);
+  if (dms.main_link.RecordCount>10) then
+  begin
+    ShowMessage('Diqqat !! Mijozga majburiy bonus hisoblanadi !');
+    if not (DMS.asos_slave.State in [dsEdit, dsInsert]) then
+      DMS.asos_slave.Edit;
+    DMS.asos_slavezakaz_gapir.AsVariant:=1;
+    bonus.OnClick := nil;bonus.Checked := true;bonus.OnClick := bonusClick;
+    DMS.asos_slave.post;
+    if not (DMS.asos.State in [dsEdit, dsInsert]) then
+      DMS.asos.Edit;
+    DMS.asoscheg_n.AsFloat:=f*10/100;
+    DMS.asoscheg_d.AsFloat:=n*10/100;
+    DMS.asossumma_ch.AsFloat:=DMS.asossumma.AsFloat-DMS.asoscheg_n.AsFloat;
+    DMS.asos.post;
+  end
+  else if (dms.main_link.RecordCount>1) and (dms.main_link.RecordCount<11) then
+  begin
+    if bonus.Checked=true then
+    begin
+      ShowMessage('Diqqat !! Mijozga ihtiyoriy bonus hisoblanadi !');
+      if not (DMS.asos.State in [dsEdit, dsInsert]) then
+        DMS.asos.Edit;
+      DMS.asoscheg_n.AsFloat:=f*10/100;
+      DMS.asoscheg_d.AsFloat:=n*10/100;
+      DMS.asossumma_ch.AsFloat:=DMS.asossumma.AsFloat-DMS.asoscheg_n.AsFloat;
+      DMS.asos.post;
+    end
+    else
+    begin
+    if not (DMS.asos.State in [dsEdit, dsInsert]) then
+      DMS.asos.Edit;
+    DMS.asoscheg_n.AsFloat:=0;
+    DMS.asoscheg_d.AsFloat:=0;
+    DMS.asossumma_ch.AsFloat:=DMS.asossumma.AsFloat-DMS.asoscheg_n.AsFloat;
+
+    DMS.asos.post;
+
+    end;
+  end
+  else
+  begin
+    if not (DMS.asos.State in [dsEdit, dsInsert]) then
+      DMS.asos.Edit;
+    DMS.asoscheg_n.AsFloat:=0;
+    DMS.asoscheg_d.AsFloat:=0;
+
+    DMS.asos.post;
+  end;
+
+end;
+
+procedure Tkassa.bonusClick(Sender: TObject);
+var f,n:Currency;
+begin
+  if bonus.Checked=true then
+  begin
+    if not (DMS.asos_slave.State in [dsEdit, dsInsert]) then
+      DMS.asos_slave.Edit;
+    DMS.asos_slavezakaz_gapir.AsVariant:=1;
+    DMS.asos_slave.post;
+    //Exit;
+  end
+  else
+  begin
+    if not (DMS.asos_slave.State in [dsEdit, dsInsert]) then
+      DMS.asos_slave.Edit;
+    DMS.asos_slavezakaz_gapir.AsVariant:=0;
+    DMS.asos_slave.post;
+
+  end;
+  /////
+    EnsureTransportSlaveRow;
+  //if dms.asos_slave.State = dsInsert then
+  //  dms.asos_slave.Post;
+    if not (DMS.asos_slave.State in [dsEdit, dsInsert]) then
+      DMS.asos_slave.Edit;
+    if bonus.Checked=true then
+    DMS.asos_slavezakaz_gapir.AsVariant:=1
+    else DMS.asos_slavezakaz_gapir.AsVariant:=0;
+    DMS.asos_slave.post;
 
   //if dms.asosh_id.AsString='' then exit;
   dms.main_link.Close;dms.main_link.SQL.Clear;
@@ -3970,17 +4234,20 @@ begin
   if (dms.main_link.RecordCount>10) then
   begin
     ShowMessage('Diqqat !! Mijozga majburiy bonus hisoblanadi !');
-    bonus.Checked:=true;
-    bonus.Enabled:=false;
+    if not (DMS.asos_slave.State in [dsEdit, dsInsert]) then
+      DMS.asos_slave.Edit;
+    DMS.asos_slavezakaz_gapir.AsVariant:=1;
+    DMS.asos_slave.post;
+    bonus.OnClick := nil;bonus.Checked := True;bonus.OnClick := bonusClick;
     if not (DMS.asos.State in [dsEdit, dsInsert]) then
       DMS.asos.Edit;
     DMS.asoscheg_n.AsFloat:=f*10/100;
     DMS.asoscheg_d.AsFloat:=n*10/100;
+    DMS.asossumma_ch.AsFloat:=DMS.asossumma.AsFloat-DMS.asoscheg_n.AsFloat;
     DMS.asos.post;
   end
-  else if (dms.main_link.RecordCount>1) and (dms.main_link.RecordCount<10) then
+  else if (dms.main_link.RecordCount>1) and (dms.main_link.RecordCount<11) then
   begin
-    bonus.Enabled:=true;
     if bonus.Checked=true then
     begin
       ShowMessage('Diqqat !! Mijozga ihtiyoriy bonus hisoblanadi !');
@@ -3988,36 +4255,35 @@ begin
         DMS.asos.Edit;
       DMS.asoscheg_n.AsFloat:=f*10/100;
       DMS.asoscheg_d.AsFloat:=n*10/100;
+      DMS.asossumma_ch.AsFloat:=DMS.asossumma.AsFloat-DMS.asoscheg_n.AsFloat;
+
       DMS.asos.post;
-    end;
-  end
-  else
-  begin
-    bonus.Checked:=false;
-    bonus.Enabled:=false;
+    end
+    else
+    begin
     if not (DMS.asos.State in [dsEdit, dsInsert]) then
       DMS.asos.Edit;
     DMS.asoscheg_n.AsFloat:=0;
     DMS.asoscheg_d.AsFloat:=0;
+    DMS.asossumma_ch.AsFloat:=DMS.asossumma.AsFloat-DMS.asoscheg_n.AsFloat;
+
+    DMS.asos.post;
+
+    end;
+  end
+  else
+  begin
+    if not (DMS.asos.State in [dsEdit, dsInsert]) then
+      DMS.asos.Edit;
+    DMS.asoscheg_n.AsFloat:=0;
+    DMS.asoscheg_d.AsFloat:=0;
+
     DMS.asos.post;
   end;
 
-end;
 
-procedure Tkassa.bonusClick(Sender: TObject);
-begin
-  if bonus.Checked=true then
-  begin
-    Label48Click(Sender);
-    Exit;
-  end;
+  ////
 
-  if not (dms.asos.State in [dsEdit, dsInsert]) then
-    dms.asos.Edit;
-
-  DMS.asoscheg_n.AsFloat:=0;
-  DMS.asoscheg_d.AsFloat:=0;
-  dms.asos.Post;
 end;
 
 procedure Tkassa.chekniochirish3Click(Sender: TObject);
@@ -4111,19 +4377,70 @@ procedure Tkassa.Label44DblClick(Sender: TObject);
 var f,n:Currency;d:TDateTime;
 begin
   f:=0;n:=0;d:=now;
+
   if bonus.Checked=false then exit;
+  dms.main_link.Refresh;
   dms.main_link.First;
   while (not dms.main_link.eof) do begin
     if (DMS.asosid.AsInteger<>dms.main_link.FieldByName('id').AsInteger) then begin
       f:=f+dms.main_link.fieldbyname('summa').AsFloat;
       n:=n+dms.main_link.fieldbyname('kurs').AsFloat;
-      sql.close;sql.SQL.Clear;
-      sql.SQL.Add('UPDATE asos set qabul_sana = '+kasayatime(d)+' where id = '+dms.main_link.fieldbyname('id').AsString);
-      sql.ExecSQL;
-      //Memo2.Visible:=true;Memo2.Lines.Add(sql.SQL.Text);exit;
     end;
+    sql.close;sql.SQL.Clear;
+    sql.SQL.Add('UPDATE asos set qabul_sana = '+kasayatime(d)+' where id = '+dms.main_link.fieldbyname('id').AsString);
+    sql.ExecSQL;
+
     dms.main_link.Next;
   end;
+  dms.main_link.Last;
+  if dms.main_link.FieldByName('summa').AsFloat-f*10/100>0 then begin
+  sql.Close;
+  sql.SQL.Clear;
+  sql.SQL.Text :=
+  'UPDATE asos SET '+
+  'sum_d_ch = sum_d_ch - :nsum, '+
+  'summa_ch = summa - :fsum, '+
+  'cheg_n = :fsum, '+
+  'cheg_d = :nsum '+
+  'WHERE id = :id';
+
+  sql.ParamByName('nsum').AsFloat := n * 10 / 100;
+  sql.ParamByName('fsum').AsFloat := f * 10 / 100;
+  sql.ParamByName('id').AsInteger := dms.main_link.FieldByName('id').AsInteger;
+
+  sql.ExecSQL;
+
+end
+  else
+  begin
+sql.Close;
+sql.SQL.Clear;
+sql.SQL.Text :=
+  'UPDATE asos set '+
+  'sum_d_ch = :sum_d_ch, '+
+  'summa_ch = :summa_ch, '+
+  'cheg_n = :cheg_n, '+
+  'cheg_d = :cheg_d '+
+  'where id = :id';
+
+sql.ParamByName('sum_d_ch').AsFloat := 0;
+sql.ParamByName('summa_ch').AsFloat := 0;
+sql.ParamByName('cheg_n').AsFloat := f * 10 / 100;
+sql.ParamByName('cheg_d').AsFloat := n * 10 / 100;
+sql.ParamByName('id').AsInteger := dms.main_link.FieldByName('id').AsInteger;
+
+Memo2.Lines.Add(sql.SQL.Text);
+sql.ExecSQL;
+  end;
+
+
+
+  exit;
+  if dms.asos.State=dsInsert then
+  ShowMessage('exit');
+  if dms.asos.RecordCount=0 then
+  ShowMessage('');
+
   DMS.asos.Edit;
   dms.asoscheg_d.AsFloat:=n*10/100;
   dms.asoscheg_n.AsFloat:=f*10/100;
@@ -4133,17 +4450,16 @@ begin
     DMS.asosqabul_sana.AsDateTime:=d;
   end;
   DMS.asos.post;
-
-  dms.main_link.Refresh;
+  if dms.asos.State=dsInsert then
+  ShowMessage('post');
 
 end;
 
 procedure Tkassa.jamiExit(Sender: TObject);
 begin
-  EnsureTransportSlaveRow;
-
-  if (jami.Value=0) or VarIsNull(sot.Value) then
+  if (jami.Value=0) or (jami.Value=null) or VarIsNull(sot.Value) then
     Exit;
+  EnsureTransportSlaveRow;
 
   kub.Value := RoundTo(jami.Value / sot.Value, -3);
 
@@ -4167,8 +4483,8 @@ begin
 
   dms.asos.Refresh;
 
-  if nom_.Text<>'' then
-    new.SetFocus
+  if jami.Value>0 then
+    f5.SetFocus
   else
     nom_.SetFocus;
 end;
@@ -4182,6 +4498,20 @@ end;
 procedure Tkassa.kubKeyPress(Sender: TObject; var Key: Char);
 begin
   if Key = #13 then begin Key:=#0;Perform(WM_NEXTDLGCTL,0,0);end;
+
+end;
+
+procedure Tkassa.Label45DblClick(Sender: TObject);
+begin
+  if show1.Visible=true then
+  begin show1.Visible:=false;show2.Visible:=false;memo2.Visible:=false; end
+  else
+  begin show1.Visible:=true;show2.Visible:=true;memo2.Visible:=true;end;
+end;
+
+procedure Tkassa.Memo2DblClick(Sender: TObject);
+begin
+  Memo2.Lines.AddStrings(dms.asos.SQL);
 
 end;
 

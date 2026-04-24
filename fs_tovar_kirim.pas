@@ -130,7 +130,7 @@ implementation
 
 {$R *.dfm}
 uses fdms,fs_tovar_edit,fulanish, wcrypt2, Math,ClipBrd, fkirim_edit,frxBarcode,
-  comobj,fkirim, fsetup, fhato;
+  comobj,fkirim, fsetup;
 //возвращает с английской раскладки русскую
 function EngToRus(const s: string): string;
 var reS: string;
@@ -295,8 +295,6 @@ begin
      DMS.s_tovar.Edit;
      DMS.s_tovardel_flag.Value:=0;
      DMS.s_tovar.Post;
-     hatolar.t_id.Text:=DMS.s_tovarid.AsString;
-     hatolar.qoldiq_tekshirClick(Sender);
 
      DMS.s_tovar.Refresh;
    end;
@@ -1032,8 +1030,6 @@ end;
 
 procedure Ts_tovar_kirim.qaytahisoblash1Click(Sender: TObject);
 begin
-  hatolar.t_id.Text:=dms.s_tovarid.AsString;
-  hatolar.qoldiq_tekshirClick(sender);
 end;
 
 end.

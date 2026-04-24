@@ -217,7 +217,7 @@ implementation
 
 {$R *.dfm}
 uses fdms,fs_tovar_edit,fulanish, wcrypt2, Math,ClipBrd, fs_ostatka,fs_ombor,fsetup,frxBarcode,
-  comobj, DateUtils, ftarozi, fhato;
+  comobj, DateUtils, ftarozi;
 procedure ExcelFormatRange(RangeFormat: Variant;Font: string;Size: Byte;AutoFit,jir,perenos: Boolean);
 begin
   RangeFormat.Font.Name := Font;RangeFormat.Font.Size := Size;
@@ -489,8 +489,6 @@ if (ulanish.metod.ItemIndex=2) and (admin_type='2') and(length(DMS.s_tovarshtrix
      DMS.s_tovar.Edit;
      DMS.s_tovardel_flag.Value:=0;
      DMS.s_tovar.Post;
-     hatolar.t_id.Text:=DMS.s_tovarid.AsString;
-     hatolar.qoldiq_tekshirClick(Sender);
      if DMS.s_tovar.RecordCount<>DMS.s_tovar.RecNo then DMS.s_tovar.next else dms.s_tovar.Prior;
      rec:=DMS.s_tovarid.AsInteger;
      DMS.s_tovar.Refresh;
@@ -575,7 +573,6 @@ begin
     if DMS.s_tovarqoldiq.AsString='Y' then DMS.s_tovarqoldiq.AsString:='-'
     else  DMS.s_tovarqoldiq.AsString:='Y';
     DMS.s_tovar.Post;
-    hatolar.t_id.Text:=DMS.s_tovarid.AsString;hatolar.qoldiq_tekshirClick(Sender);
   end;
 end;
 
@@ -880,8 +877,6 @@ begin
      DMS.qoldiq.Edit;
      DMS.qoldiq.FieldByName('del_flag').Value:=0;
      DMS.qoldiq.Post;
-     hatolar.t_id.Text:=dms.qoldiqtovar_id.AsString;
-     hatolar.qoldiq_tekshirClick(Sender);
 
      DMS.qoldiq.Refresh;tqoldiq.Refresh;
   end;
@@ -2103,8 +2098,6 @@ end;
 
 procedure Ts_tovar.qaytahisoblash1Click(Sender: TObject);
 begin
-  hatolar.t_id.Text:=dms.s_tovarid.AsString;
-  hatolar.qoldiq_tekshirClick(sender);
   tqoldiq.Refresh;
 end;
 

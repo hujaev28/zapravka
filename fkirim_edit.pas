@@ -128,7 +128,7 @@ var
 implementation
 
 {$R *.dfm}
-uses fulanish, fdms, Math, fkirim, fsetup, fhato;
+uses fulanish, fdms, Math, fkirim, fsetup;
 
 procedure tovarbaza_kirim();
 begin
@@ -356,8 +356,6 @@ begin
   DMS.link.close;DMS.link.SQL.Clear;
   DMS.link.sql.add('SELECT s.id,main.serial FROM slave_main s,main where main.id=s.main_id and s.slave_id=:id order by id');
   DMS.link.Open;
-  hatolar.t_id.Text:=DMS.s_t_allid.AsString;
-  hatolar.qoldiq_tekshirClick(Sender);
   kirim_edit.Close;
 end;
 

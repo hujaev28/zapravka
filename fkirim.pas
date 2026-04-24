@@ -178,8 +178,7 @@ implementation
 
 {$R *.dfm}
 uses fs_client,fulanish, fdms, fs_diler, fs_ombor_edit, fkirim_asos,Math,clipbrd,
-  fs_tovar_kirim, fkirim_edit,fsetup,QRGraphics, QR_Win1251, QR_URL, jpeg,
-  fhato;
+  fs_tovar_kirim, fkirim_edit,fsetup,QRGraphics, QR_Win1251, QR_URL, jpeg;
 procedure Tkirim.RemakeQR(s:string);
 // QR-code generation
 begin
@@ -418,8 +417,6 @@ begin
     while not dms.k_slave1.Eof do begin
       if not DMS.s_tovar.Locate('id',dms.k_slave1tovar_id.AsInteger,[loCaseInsensitive]) then begin
         ShowMessage(dms.k_slave1tovar_nom.AsString+' topilmadi');exit; end;
-      hatolar.t_id.Text:=DMS.s_tovarid.AsString;
-      hatolar.qoldiq_tekshirClick(Sender);
       dms.link.Close;dms.link.SQL.Clear;
       dms.link.SQL.Add('update slave_main set del_flag=0 where slave_id='+DMS.k_slave1id.AsString);
       dms.link.ExecSQL;
@@ -475,8 +472,6 @@ begin
 
     if not DMS.s_tovar.Locate('id',dms.k_slave1tovar_id.AsInteger,[loCaseInsensitive]) then begin
     ShowMessage(dms.k_slave1tovar_nom.AsString+' topilmadi '+dms.k_slave1tovar_id.AsString);exit; end;
-    hatolar.t_id.Text:=DMS.s_tovarid.AsString;
-    hatolar.qoldiq_tekshirClick(Sender);
 
     dms.link.Close;dms.link.SQL.Clear;
     dms.link.SQL.Add('update slave_main set del_flag=0 where slave_id='+DMS.k_slave1id.AsString);

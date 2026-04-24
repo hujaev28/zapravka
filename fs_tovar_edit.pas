@@ -180,7 +180,7 @@ implementation
 
 {$R *.dfm}
 uses fs_client,fulanish, fdms, Math,fs_tovar, fs_ostatka, fs_tovar_kirim, frxBarcode,fs_t_otdel,
-  fzavod, fsetup,ClipBrd, fhato;
+  fzavod, fsetup,ClipBrd;
 function _IntToStr(i, Wide: Cardinal): string;
 var i1: Cardinal;
 begin
@@ -321,9 +321,6 @@ begin
     end;
     dms.qoldiq.Refresh;
   end;
-
-    hatolar.t_id.Text:=dms.s_tovarid.AsString;
-    hatolar.qoldiq_tekshirClick(Sender);
   
   dms.link.close;dms.link.SQL.Clear;
   dms.link.sql.add('SELECT s.id,main.serial FROM slave_main s,main where main.id=s.main_id and s.slave_id=:id order by id');
@@ -680,8 +677,6 @@ begin
   dms.qoldiqqrkod.Value:=0;
     dms.qoldiq.FieldByName('sotish').AsFloat:=0;
   s_tovar_edit.Close;
-  hatolar.t_id.Text:=DMS.s_tovarid.AsString;
-  hatolar.qoldiq_tekshirClick(Sender);
   s_ostatka.showmodal;
 end;
 

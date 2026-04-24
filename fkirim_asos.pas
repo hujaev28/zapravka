@@ -174,8 +174,6 @@ begin
 
   dms.k_slave1.First;
   while not dms.k_slave1.Eof do begin
-    //hatolar.t_id.Text:=DMS.s_tovarid.AsString;
-    //hatolar.qoldiq_tekshirClick(Sender);
     dms.k_slave1.Next;
   end;
 

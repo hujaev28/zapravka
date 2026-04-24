@@ -61,7 +61,6 @@ uses
   fs_x_tur in 'fs_x_tur.pas' {s_x_tur},
   fjamiaylanma in 'fjamiaylanma.pas' {jamiaylanma},
   fotch_oborot_tovar in 'fotch_oborot_tovar.pas' {otch_oborot_tovar},
-  fhato in 'fhato.pas' {hatolar},
   fotch_xarajat in 'fotch_xarajat.pas' {otch_xarajat},
   fNazorat in 'fNazorat.pas' {Nazorat},
   fkirim in 'fkirim.pas' {kirim},
@@ -146,7 +145,6 @@ begin
   Application.CreateForm(Ts_x_tur, s_x_tur);
   Application.CreateForm(Tjamiaylanma, jamiaylanma);
   Application.CreateForm(Totch_oborot_tovar, otch_oborot_tovar);
-  Application.CreateForm(Thatolar, hatolar);
   Application.CreateForm(Totch_xarajat, otch_xarajat);
   Application.Run;
 end.

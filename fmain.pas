@@ -137,7 +137,7 @@ uses fs_kassa, fulanish, fdms, fs_client, fs_tovar, fkassa,
   fbank_aylanma, fotch_xarajat, fs_ombor_komil, fs_kurs,
   fs_papka, fportizm, fotch_kam, fs_t_otdel, fotch_reklama, fpl_click,
   fclick_aylanma, fjamiaylanma, fQraz, fNazorat, fyukla, fotch_brand,
-  fsmsbot, fhato, fkirimh, fkirim_edit, fkirim_asos, fs_mobil;
+  fsmsbot, fkirimh, fkirim_edit, fkirim_asos, fs_mobil;
 
 {$R *.dfm}
 
@@ -668,7 +668,6 @@ end;
 
 procedure Tmain.Hatoliklar1Click(Sender: TObject);
 begin
-  hatolar.showmodal;
 end;
 
 procedure Tmain.Dollarkursi1Click(Sender: TObject);

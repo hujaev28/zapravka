@@ -1,7 +1,7 @@
 object DMS: TDMS
   OldCreateOrder = False
-  Left = 330
-  Top = 135
+  Left = 393
+  Top = 219
   Height = 566
   Width = 1078
   object lbd: TZConnection
@@ -16,6 +16,7 @@ object DMS: TDMS
       'reconnect=true'
       'AutoEncodeStrings=True'
       'codepage=cp1251')
+    Connected = True
     Left = 814
     Top = 17
   end
@@ -1797,6 +1798,9 @@ object DMS: TDMS
     end
     object asos_slaveopt2: TFloatField
       FieldName = 'opt2'
+    end
+    object asos_slavezakaz_gapir: TIntegerField
+      FieldName = 'zakaz_gapir'
     end
   end
   object Dasos_slave: TDataSource
@@ -4389,6 +4393,7 @@ object DMS: TDMS
   end
   object main_link: TZQuery
     Connection = lbd
+    BeforePost = main_linkBeforePost
     SQL.Strings = (
       'SELECT * FROM prot_sms')
     Params = <>

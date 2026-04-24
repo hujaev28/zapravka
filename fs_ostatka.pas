@@ -135,7 +135,7 @@ var
 implementation
 
 {$R *.dfm}
-uses fs_client,fulanish, fdms, fs_asos, fs_diler, Math, fsetup, fhato;
+uses fs_client,fulanish, fdms, fs_asos, fs_diler, Math, fsetup;
 function RoundLess(Value, Divider: Integer): Integer;
 var s:string;
 begin
@@ -253,8 +253,6 @@ begin
   if dms.qoldiq.FieldByName('tovar_id').AsInteger=0 then
     dms.qoldiq.FieldByName('tovar_id').AsInteger:=dms.s_tovarid.AsInteger;
   dms.qoldiq.Post;
-  hatolar.t_id.Text:=DMS.s_tovarid.AsString;
-  hatolar.qoldiq_tekshirClick(Sender);
   dms.s_tovar.Edit;
   if DMS.qoldiqsena.AsFloat>0 then dms.s_tovarsena.AsFloat:=DMS.qoldiqsena.AsFloat;
   if DMS.qoldiqsena_d.AsFloat>0 then dms.s_tovarsena_d.AsFloat:=DMS.qoldiqsena_d.AsFloat;

@@ -1193,6 +1193,7 @@ type
     haridorlar: TZQuery;
     Dharidorlar: TDataSource;
     asoshfio: TStringField;
+    asos_slavezakaz_gapir: TIntegerField;
     procedure s_kassas_statusGetText(Sender: TField; var Text: String;
       DisplayText: Boolean);
     procedure s_xodims_statusGetText(Sender: TField; var Text: String;
@@ -1258,6 +1259,7 @@ type
     procedure asosAfterScroll(DataSet: TDataSet);
     procedure tplBeforePost(DataSet: TDataSet);
     procedure asosBeforePost(DataSet: TDataSet);
+    procedure main_linkBeforePost(DataSet: TDataSet);
   private
     { Private declarations }
   public
@@ -1923,6 +1925,11 @@ end;
 procedure TDMS.asosBeforePost(DataSet: TDataSet);
 begin
   If asostur_oper.AsInteger=0 then abort; 
+end;
+
+procedure TDMS.main_linkBeforePost(DataSet: TDataSet);
+begin
+  If main_link.FieldByName('tur_oper').AsInteger=0 then abort;
 end;
 
 end.

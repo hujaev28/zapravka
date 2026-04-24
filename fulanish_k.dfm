@@ -1,6 +1,6 @@
 object ulanish_k: Tulanish_k
-  Left = 539
-  Top = 204
+  Left = 540
+  Top = 205
   Width = 664
   Height = 581
   BorderIcons = [biSystemMenu, biHelp]
